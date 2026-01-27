@@ -1,0 +1,96 @@
+# ===============================
+# Unity .gitignore (FULL)
+# Place this at the root of your Unity project
+# Based on official GitHub Unity.gitignore
+# ===============================
+
+# -------- Core Unity folders --------
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# -------- Memory & recordings --------
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# -------- Unity crash reports --------
+sysinfo.txt
+mono_crash.*
+
+# -------- Build artifacts --------
+*.apk
+*.aab
+*.app
+*.unitypackage
+*.unitypackage.meta
+
+# -------- Logs --------
+*.log
+
+# -------- Blender auto files --------
+*.blend1
+*.blend1.meta
+
+# -------- IDE / Editor files --------
+.vs/
+.gradle/
+.consulo/
+.idea/
+
+# Visual Studio / Rider generated files
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.DotSettings.user
+
+# -------- Unity-generated meta for binaries --------
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# -------- JetBrains Rider plugin --------
+[Aa]ssets/Plugins/Editor/JetBrains*
+
+# -------- Test Runner --------
+[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# -------- Addressables (default ignores) --------
+/ServerData
+[Aa]ssets/StreamingAssets/aa*
+[Aa]ssets/AddressableAssetsData/link.xml*
+[Aa]ssets/Addressables_Temp*
+[Aa]ssets/AddressableAssetsData/*/*.bin*
+
+# -------- Visual Scripting generated --------
+[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db
+[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db.meta
+[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers
+[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers.meta
+
+# -------- OS junk --------
+.DS_Store
+Thumbs.db
+
+# -------- Optional: Asset Store tools --------
+# [Aa]ssets/AssetStoreTools*
+
+# ===============================
+# IMPORTANT:
+# Do NOT ignore .meta files globally!
+# Unity needs them for references & GUIDs
+# ===============================
