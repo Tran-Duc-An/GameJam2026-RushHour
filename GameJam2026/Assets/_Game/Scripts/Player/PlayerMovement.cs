@@ -1,47 +1,146 @@
 using UnityEngine;
+using System.Collections;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerController : MonoBehaviour,ICooldown
 {
-    [Header("Movement Settings")]
-    [Tooltip("How fast the character moves.")]
-    public float moveSpeed = 5f;
+    // Define the States
+    private enum State { Normal, Rolling, Locked }
+    private State currentState;
 
-    [Header("Components")]
+    [Header("Movement")]
+    public float moveSpeed = 6f;
     public Rigidbody2D rb;
-    public Animator animator; // Optional: Link this if you have animations later
+    public Animator animator;
+    private Vector2 moveInput;
 
-    private Vector2 movement;
+    [Header("Dash / Roll")]
+    public float rollSpeed = 15f;
+    public float rollDuration = 0.2f;
+    public float rollCooldown = 1f;
+    [Tooltip("Reference to the Trail Renderer component")]
+    public TrailRenderer tr;
+    
+    private float lastRollTime;
+    private Vector2 rollDirection;
 
-    // Update is called once per frame
-    // We use this for processing Inputs (Key presses)
+    void Start()
+    {
+        currentState = State.Normal;
+    }
+
     void Update()
     {
-        // Get Input (Returns -1, 0, or 1)
-        // "Raw" makes the movement stop immediately when you let go (Snappy feel)
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
-
-        // Prevent diagonal movement from being faster than straight movement
-        movement = movement.normalized;
-
-        // Optional: Simple sprite flipping based on direction
-        if (movement.x > 0)
-            transform.localScale = new Vector3(1, 1, 1); // Face Right
-        else if (movement.x < 0)
-            transform.localScale = new Vector3(-1, 1, 1); // Face Left
-
-        // Optional: Send data to Animator
-        if (animator != null)
+        // 1. Check Inputs based on State
+        switch (currentState)
         {
-            animator.SetFloat("Speed", movement.sqrMagnitude);
+            case State.Normal:
+                HandleInput();
+                break;
+            
+            case State.Rolling:
+                // Ignore movement input while rolling
+                break;
+
+            case State.Locked:
+                // Cutscene or Death state
+                break;
+        }
+        
+        // 2. Animation (Optional)
+        UpdateAnimation();
+    }
+
+    void FixedUpdate()
+    {
+        switch (currentState)
+        {
+            case State.Normal:
+                rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
+                break;
+
+            case State.Rolling:
+                // Move very fast in the roll direction
+                rb.MovePosition(rb.position + rollDirection * rollSpeed * Time.fixedDeltaTime);
+                break;
         }
     }
 
-    // FixedUpdate is called at a fixed interval
-    // We use this for Physics calculations to ensure smooth collision
-    void FixedUpdate()
+    void HandleInput()
     {
-        // Move the Rigidbody
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+        // Basic Movement
+        float x = Input.GetAxisRaw("Horizontal");
+        float y = Input.GetAxisRaw("Vertical");
+        moveInput = new Vector2(x, y).normalized;
+
+        // Visual Flip
+        if (moveInput.x != 0)
+            transform.localScale = new Vector3(Mathf.Sign(moveInput.x), 1, 1);
+
+        // Dash Input (Space or Shift)
+        if (Input.GetKeyDown(KeyCode.Space) && Time.time > lastRollTime + rollCooldown)
+        {
+            // Only roll if we are actually moving
+            if (moveInput != Vector2.zero)
+            {
+                StartCoroutine(RollRoutine());
+            }
+        }
+    }
+
+    IEnumerator RollRoutine()
+    {
+        // 1. Enter Rolling State
+        currentState = State.Rolling;
+        rollDirection = moveInput;
+        lastRollTime = Time.time;
+
+        // 2. Visuals & Physics
+        if (tr != null) tr.emitting = true; // Turn on trail
+        
+        // 3. Make Invincible (Communicate with Health Script)
+        // We assume your Health script has a public SetInvincible method
+        // If not, we can access the private bool via a method
+        // healthScript.SetInvincible(true); 
+
+        yield return new WaitForSeconds(rollDuration);
+
+        // 4. Exit Rolling State
+        if (tr != null) tr.emitting = false;
+        // healthScript.SetInvincible(false);
+        
+        // Stop momentum slightly so we don't slide forever
+        rb.linearVelocity = Vector2.zero; 
+        
+        currentState = State.Normal;
+    }
+
+    void UpdateAnimation()
+    {
+        if (animator == null) return;
+        
+        animator.SetFloat("Speed", moveInput.sqrMagnitude);
+        animator.SetBool("IsRolling", currentState == State.Rolling);
+    }
+
+    public float GetCooldownFactor()
+    {
+        // Calculate how much time has passed since the last roll
+        float timeSinceRoll = Time.time - lastRollTime;
+        
+        // If we are past the cooldown time, return 0 (Empty fill = Ready)
+        if (timeSinceRoll >= rollCooldown) return 0f;
+        
+        // Otherwise, return the percentage (1.0 = Just used, 0.5 = Halfway)
+        return 1f - (timeSinceRoll / rollCooldown);
+    }
+
+    public bool IsReady()
+    {
+        return Time.time >= lastRollTime + rollCooldown;
+    }
+
+    public string GetAbilityName()
+    {
+        return "Dash";
     }
 }
