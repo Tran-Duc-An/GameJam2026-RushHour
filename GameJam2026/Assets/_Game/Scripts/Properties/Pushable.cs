@@ -18,6 +18,8 @@ public class Pushable : MonoBehaviour, IInteractable
 
     public void Interact(PlayerInteractor player)
     {
+        Debug.Log("Pushing object");
+
         Vector2 pushDirection = (transform.position - player.transform.position).normalized;
         m_Rigidbody.AddForce(pushDirection * m_PushForce, ForceMode2D.Impulse);
     }
