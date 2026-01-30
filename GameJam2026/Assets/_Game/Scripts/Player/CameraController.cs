@@ -15,6 +15,7 @@ public class CameraDeadzone : MonoBehaviour
 
     // Keep the camera's Z position (-10) so we don't clip
     private float zPosition = -10f;
+    private float targetX;
 
     void Start()
     {
@@ -36,7 +37,9 @@ public class CameraDeadzone : MonoBehaviour
         // If player is too far right...
         if (diffX > deadzoneSize.x)
         {
-            finalPos.x = player.position.x - deadzoneSize.x;
+            // finalPos.x = player.position.x - deadzoneSize.x;'
+            float deltaX = diffX - deadzoneSize.x;
+            finalPos.x += deltaX * 0.2f;
         }
         // If player is too far left...
         else if (diffX < -deadzoneSize.x)

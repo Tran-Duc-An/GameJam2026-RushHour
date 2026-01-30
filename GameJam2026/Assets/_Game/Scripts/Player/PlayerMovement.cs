@@ -94,23 +94,24 @@ public class PlayerController : MonoBehaviour,ICooldown
         rollDirection = moveInput;
         lastRollTime = Time.time;
 
-        // 2. Visuals & Physics
-        if (tr != null) tr.emitting = true; // Turn on trail
-        
-        // 3. Make Invincible (Communicate with Health Script)
-        // We assume your Health script has a public SetInvincible method
-        // If not, we can access the private bool via a method
-        // healthScript.SetInvincible(true); 
+        // 2. Smooth Trail Start
+        if (tr != null) 
+        {
+            tr.Clear(); // Remove any leftover segments from the last dash
+            tr.emitting = true;
+        }
 
         yield return new WaitForSeconds(rollDuration);
 
-        // 4. Exit Rolling State
-        if (tr != null) tr.emitting = false;
-        // healthScript.SetInvincible(false);
+        // 3. Smooth Trail End
+        if (tr != null) 
+        {
+            tr.emitting = false; 
+            // Note: The trail will naturally fade out based on its "Time" setting 
+            // in the inspector rather than disappearing instantly.
+        }
         
-        // Stop momentum slightly so we don't slide forever
         rb.linearVelocity = Vector2.zero; 
-        
         currentState = State.Normal;
     }
 
