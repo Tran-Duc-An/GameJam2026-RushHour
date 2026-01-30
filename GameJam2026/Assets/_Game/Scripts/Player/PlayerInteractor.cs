@@ -4,8 +4,9 @@ using UnityEngine.InputSystem;
 public class PlayerInteractor : MonoBehaviour
 {
     [SerializeField]
-    private float m_InteractRange = 5f;
+    private float m_InteractRange = 1f;
     private LayerMask m_InteractableLayer;
+    public Transform GrabPoint;
 
     void Start()
     {
@@ -19,11 +20,11 @@ public class PlayerInteractor : MonoBehaviour
 
     public void Interact(InputAction.CallbackContext context)
     {
-        Debug.Log("Interact action triggered");
+        // Debug.Log("Interact action triggered");
 
         if (context.started)
         {
-            Debug.Log("Attempting to interact with nearby objects");
+            // Debug.Log("Attempting to interact with nearby objects");
 
             Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, m_InteractRange, m_InteractableLayer);
             foreach (var hit in hits)
@@ -36,5 +37,11 @@ public class PlayerInteractor : MonoBehaviour
                 }
             }
         }
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, m_InteractRange);
     }
 }

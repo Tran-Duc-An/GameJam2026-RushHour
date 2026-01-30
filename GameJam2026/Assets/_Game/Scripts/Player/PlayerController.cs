@@ -27,4 +27,11 @@ public class PlayerController : MonoBehaviour
     {
         m_MoveInput = context.ReadValue<Vector2>();
     }
+
+    // Draw move input direction in editor
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(transform.position, transform.position + (Vector3)(m_MoveInput * 2f));
+    }
 }
